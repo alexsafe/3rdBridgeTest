@@ -15,6 +15,7 @@
 - more exhaustive error handing
 - more attention to edge cases: Api temporarily not available, wrong request, too many requests, etc. I would try and give the user the most precise errors possible.
 - improve the usage of types
+- handle ios pods and other specifics
 
 
 
