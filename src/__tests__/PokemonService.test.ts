@@ -1,7 +1,7 @@
 // __tests__/PokemonService.test.ts
 import axios from 'axios';
 import { PokemonService } from '../services';
-import { PokemonErrorType } from '../utils/erorrs/error-types';
+import { PokemonErrorType } from '../utils/erorrs/error.types';
 
 
 jest.mock('axios');

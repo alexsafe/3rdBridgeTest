@@ -1,4 +1,4 @@
-import { PokemonErrorType } from "./error-types";
+import { PokemonErrorType } from "./error.types";
 
 export const handleApiError = (error: any): PokemonErrorType => {
   if (!error.response) {

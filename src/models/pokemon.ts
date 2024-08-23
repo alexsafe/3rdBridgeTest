@@ -18,7 +18,7 @@ export type Chain = {
   species: ChainSpecies
 }
 
-export type Species = {
+export type Species = { 
   name: string
   url: string
   id: string

@@ -1,7 +1,7 @@
 // src/__tests__/api.test.ts
 import axios from 'axios';
-import { handleApiError } from '../utils/erorrs/apiErrors';
-import { PokemonErrorType } from '../utils/erorrs/error-types';
+import { handleApiError } from '../utils/erorrs/api.errors';
+import { PokemonErrorType } from '../utils/erorrs/error.types';
 import { PokemonService } from '../services/pokemon.service';
 
 jest.mock('axios');

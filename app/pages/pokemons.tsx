@@ -10,7 +10,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  Pressable,
+  Pressable,  
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -63,9 +63,9 @@ export default function Page() {
             },
           ]}
           renderItem={({ item, index }) => (
-            <Link
-              href={{
-                pathname: "/pages/pokemon-details",
+            <Link 
+              href={{  
+                pathname: "/pages/pokemon-details/",
                 params: { url: item.url },
               }}
               asChild
@@ -77,7 +77,7 @@ export default function Page() {
           )}
           ListFooterComponent={
             <PokemonsFooter
-              isHidden={!hasNextPage}
+              isHidden={!hasNextPage} 
               onPress={fetchNextPage}
               isLoading={isFetchingNextPage}
             />

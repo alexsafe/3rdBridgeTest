@@ -5,7 +5,7 @@ import { Species } from "../models";
 import { PokemonService } from "../services";
 import { Link } from "expo-router";
 import { PokemonCard } from "./pokemon-card";
-import { baseUrl, pokemonEndpoint } from "../utils/constants";
+import { baseUrl, pokemonEndpoint } from "../utils/constants/api.constants";
 
 type EvolutionCardProps = {
   evolutionChainUrl: string;

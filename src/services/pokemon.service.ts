@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Species } from "../models";
-import { handleApiError } from "../utils/erorrs/apiErrors";
+import { handleApiError } from "../utils/erorrs/api.errors";
 
 class PokemonServiceImpl {
   async getPokemons({
