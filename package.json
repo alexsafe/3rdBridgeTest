@@ -57,8 +57,10 @@
     "testMatch": [
       "**/__tests__/**/*.+(ts|tsx|js)"
     ],
+    "moduleDirectories": ["node_modules", "src"],
     "moduleNameMapper": {
-      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy",
+      "^@tanstack/react-query$": "<rootDir>/node_modules/@tanstack/react-query"
     },
     "preset": "react-native",
     "transform": {

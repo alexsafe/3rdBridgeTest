@@ -8,7 +8,7 @@ import { Klfgjhsoigbhb, PokemonCard } from "../../src/components";
 import EvolutionCard from "../../src/components/evolutions-card";
 import PokemonType from "../../src/components/pokemon-types";
 import PokeImage from "../../src/components/pokemon-image";
-import PokeErrors from "../../src/components/pokemon-errors";
+import PokeErrors from "../../src/components/errors/pokemon-errors";
 import Animated, {
   useSharedValue,
   useAnimatedScrollHandler,
@@ -16,10 +16,7 @@ import Animated, {
   withTiming,
   interpolate,
   Extrapolation,
-  useAnimatedProps,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Avatar } from "../../src/components/avatar";
 import {
   headerHeight,
   initialHeader,
@@ -31,7 +28,11 @@ import {
   centerImage,
   screenHeight,
 } from "../../src/utils/constants/ui.constants";
-import { red } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
+import { noOfRetries } from "../../src/utils/constants/api.constants";
+import { handleApiError } from "../../src/utils/erorrs/error.handler.";
+import { ApiErrorType } from "../../src/utils/erorrs/api.errors";
+import Loading from "../../src/components/loading";
+import ComponentError from "../../src/components/errors/pokemon-sub-errors";
 
 export default function PokemonDetails() {
   const { url } = useLocalSearchParams() as { url: string };
@@ -42,15 +43,8 @@ export default function PokemonDetails() {
     onScroll: (event) => {
       scrollY.value = event.contentOffset.y;
     },
-    onMomentumEnd: (e) => {
-      console.log("end momentl");
-    },
-    onEndDrag: (e) => {
-      console.log("enddrag");
-    },
   });
 
-  const insets = useSafeAreaInsets();
   const animatedScrollViewStyle = useAnimatedStyle(() => {
     return {
       paddingTop: withTiming(
@@ -80,17 +74,6 @@ export default function PokemonDetails() {
           duration,
         }
       ),
-      // marginBottom: withTiming(
-      //   interpolate(
-      //     scrollY.value,
-      //     [0, 100],
-      //     [0, -initialHeader],
-      //     Extrapolation.CLAMP
-      //   ),
-      //   {
-      //     duration,
-      //   }
-      // ),
     };
   });
 
@@ -144,10 +127,15 @@ export default function PokemonDetails() {
     data: pokeDetails,
     isLoading: isPokeLoading,
     error: pokeError,
-  } = useQuery<PokemonInfo, DefaultError, PokemonInfo>({
+  } = useQuery<PokemonInfo, ApiErrorType, PokemonInfo>({
     queryKey: ["pokemonDetails", url],
     queryFn: () => PokemonService.getPokemonDetails(url),
-    retry: 4,
+    retry: (failureCount, error) => {
+      if (error.status === 500 || failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
     select: (data) => ({
       species: data?.species,
       sprites: data?.sprites,
@@ -158,8 +146,6 @@ export default function PokemonDetails() {
       url: data?.url,
     }),
   });
-  // if (isPokeLoading) return <Text>Loading...</Text>;
-  // if (pokeError) return <Text>Error loading Pokemon details</Text>;
 
   let currentSpeciesUrl = pokeDetails?.species.url!;
 
@@ -167,62 +153,82 @@ export default function PokemonDetails() {
     data: pokeSpecies,
     isLoading: isSpeciesLoading,
     error: errorSpecies,
-  } = useQuery<Species, DefaultError, Species>({
+  } = useQuery<Species, ApiErrorType, Species>({
     queryKey: ["pokemonSpecies", currentSpeciesUrl],
     queryFn: () => PokemonService.getPokemonSpecies(currentSpeciesUrl),
     enabled: !!pokeDetails,
+    retry: (failureCount, error) => {
+      if (error.status === 500 || failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
     select: (data) => data,
   });
 
-  if (isSpeciesLoading) return <Text>Loading...</Text>;
-
-  // A possible way of error handling
-  if (pokeDetails === undefined) {
-    return <PokeErrors title="undefined" error="Poke not defined" />;
+  if (isPokeLoading) return <Loading />;
+  // console.log(screenHeight);
+  if (pokeError) {
+    const errorResponse = handleApiError(pokeError);
+    return (
+      <PokeErrors
+        title="Pokemon error"
+        error={errorResponse}
+        details={pokeError.status.toString() || pokeError.message}
+      />
+    );
+  }
+  if (errorSpecies) {
+    const errorResponse = handleApiError(errorSpecies);
+    <ComponentError
+      title="Species error"
+      error={errorResponse}
+      details={errorSpecies.status.toString() || errorSpecies.message}
+    />;
   }
   return (
-    <Animated.View style={[{ flex: 1 }]}>
-      <Klfgjhsoigbhb
-        animatedStyle={animatedHeaderStyle}
-        title={pokeDetails?.name}
-        rightComponent={
-          <Animated.View style={[styles.image, { right: centerImage }]}>
-            <PokeImage
-              imageUrl={pokeDetails?.sprites?.front_default}
-              shrinkStyle={animatedAvatarStyle}
-            />
-          </Animated.View>
-        }
-      >
-        <Animated.ScrollView
-          contentContainerStyle={{
+    <Klfgjhsoigbhb
+      animatedStyle={animatedHeaderStyle}
+      title={pokeDetails?.name}
+      rightComponent={
+        <Animated.View style={[styles.image, { right: centerImage }]}>
+          <PokeImage
+            imageUrl={pokeDetails?.sprites?.front_default}
+            shrinkStyle={animatedAvatarStyle}
+          />
+        </Animated.View>
+      }
+    >
+      <Animated.ScrollView
+        contentContainerStyle={[
+          {
             marginTop: screenPadding,
             paddingBottom: screenHeight * 0.25,
             paddingHorizontal: screenPadding,
-          }}
-          style={[animatedScrollViewStyle]}
-          onScroll={scrollHandler}
-        >
-          <Text>
-            {pokeDetails?.types.map((type: any, index: number) => (
-              <View key={index}>
-                <PokemonType typeUrl={type.type.url} />
-              </View>
-            ))}
-          </Text>
-          <Text style={styles.title}>First 5 Moves</Text>
-          {pokeDetails?.moves.slice(0, 5).map((move: any, index: number) => (
-            <View key={index} style={styles.contentContainerStyle}>
-              <PokemonCard item={move.move} isFirst={true} />
+          },
+        ]}
+        style={[animatedScrollViewStyle]}
+        onScroll={scrollHandler}
+      >
+        <Text>
+          {pokeDetails?.types.map((type: any, index: number) => (
+            <View key={index}>
+              <PokemonType typeUrl={type.type.url} />
             </View>
           ))}
-          <EvolutionCard
-            evolutionChainUrl={pokeSpecies?.evolution_chain.url!}
-            currentPokeUrl={currentSpeciesUrl!}
-          />
-        </Animated.ScrollView>
-      </Klfgjhsoigbhb>
-    </Animated.View>
+        </Text>
+        <Text style={styles.title}>First 5 Moves</Text>
+        {pokeDetails?.moves.slice(0, 5).map((move: any, index: number) => (
+          <View key={index} style={styles.contentContainerStyle}>
+            <PokemonCard item={move.move} isFirst={true} />
+          </View>
+        ))}
+        <EvolutionCard
+          evolutionChainUrl={pokeSpecies?.evolution_chain.url!}
+          currentPokeUrl={currentSpeciesUrl!}
+        />
+      </Animated.ScrollView>
+    </Klfgjhsoigbhb>
   );
 }
 
@@ -244,7 +250,6 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   image: {
-    // backgroundColor: 'red',
     paddingTop: 40,
     alignSelf: "center",
   },

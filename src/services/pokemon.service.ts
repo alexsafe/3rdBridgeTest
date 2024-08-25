@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Species } from "../models";
-import { handleApiError } from "../utils/erorrs/api.errors";
+import { handleApiError } from "../utils/erorrs/error.handler.";
+import { apiError } from "../utils/erorrs/api.errors";
 
 class PokemonServiceImpl {
   async getPokemons({
@@ -24,7 +25,6 @@ class PokemonServiceImpl {
 
   async getPokemonDetails(url: string) {
     const response = await this.getApi(url);
-
     return response;
   }
 
@@ -45,22 +45,29 @@ class PokemonServiceImpl {
 
   async getApi(url: string | undefined) {
     try {
-      // console.log(`getApi url: ${url}`);
       const response = await axios.get(url!);
-      // console.log("generic api call");
-      // console.log(response);
-      if (response.status < 400) {
-        // console.log(`all good for ${url}`);
-        // console.log(response.data);
-        return response.data;
-      } 
-      else {
-        // console.log(`error : ${response}  ${response.status}`);
-        throw handleApiError(response);
+      if (response.status >= 400) {
+        throw apiError(
+          `Error fetching data: ${response.statusText}`,
+          response.status,
+          response.data?.message
+        );
       }
-    } catch (error) {
-      // console.log(`error fetching data from ${error}`);
-      throw handleApiError(error);
+      return response.data;
+    } catch (error: any) {
+      if (error.response) {
+        throw apiError(
+          `Error fetching data: ${error.response.statusText}`,
+          error.response.status,
+          error.response.data?.message
+        );
+      } else if (error.request) {
+        // Errors where the request was made but no response was received
+        throw apiError(`Network error: No response received`, 0);
+      } else {
+        // Errors during the request setup
+        throw apiError(`${error.message}`, 0);
+      }
     }
   }
 }

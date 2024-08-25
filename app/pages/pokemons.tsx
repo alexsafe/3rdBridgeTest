@@ -8,9 +8,7 @@ import {
   ActivityIndicator,
   FlatList,
   StyleSheet,
-  TouchableOpacity,
-  Text,
-  Pressable,  
+  Pressable,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -21,13 +19,13 @@ import {
   PokemonsFooter,
 } from "../../src/components";
 import { Pokemon } from "../../src/models";
-import { Link, router, useNavigation } from "expo-router";
+import { Link } from "expo-router";
+import { screenPadding } from "../../src/utils/constants/ui.constants";
 
 const PAGE_SIZE = 20;
 
 export default function Page() {
   const insets = useSafeAreaInsets();
-  const navigation = useNavigation();
 
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery<
@@ -46,8 +44,7 @@ export default function Page() {
       initialPageParam: 0,
       getNextPageParam: (_, allPages) => allPages.length * PAGE_SIZE,
     });
-    // console.log("home");
-  
+
   return (
     <Klfgjhsoigbhb title="Pokemons">
       {isLoading && <ActivityIndicator />}
@@ -63,8 +60,8 @@ export default function Page() {
             },
           ]}
           renderItem={({ item, index }) => (
-            <Link 
-              href={{  
+            <Link
+              href={{
                 pathname: "/pages/pokemon-details/",
                 params: { url: item.url },
               }}
@@ -77,7 +74,7 @@ export default function Page() {
           )}
           ListFooterComponent={
             <PokemonsFooter
-              isHidden={!hasNextPage} 
+              isHidden={!hasNextPage}
               onPress={fetchNextPage}
               isLoading={isFetchingNextPage}
             />
@@ -90,6 +87,6 @@ export default function Page() {
 
 const styles = StyleSheet.create({
   contentContainerStyle: {
-    padding: 16,
+    padding: screenPadding,
   },
 });

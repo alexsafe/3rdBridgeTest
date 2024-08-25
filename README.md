@@ -1,23 +1,18 @@
 # Notes
 
-### Header
-- The Pokemon image: Not yet done. I would probably use a library for animation like reanimated or react-native-shared-element.I chose to leave the default to the small upper right corner.
-
 ### Navigation
-- For the navigation I stacked everything. I added an easy way to navigate back to the list by clicking on the title. It's commented due to the fact that the <Link would mess up the layout.
+- For the navigation I stacked everything. I added an easy way to navigate back to the pokemon list by clicking on the pokemon image in the details page.
 
 ### Details
 - I didn' find the exact sprites for the types so I chose one by myself, even if it doesn't fit the Figma.
-- Also, see ###Header :)
 
-### Known TODOs
+### Real app TODOs
+- handle the situation with not enough details for scroll. normally with a better layout. faster with a fix.  
 - more tests
 - more exhaustive error handing
-- more attention to edge cases: Api temporarily not available, wrong request, too many requests, etc. I would try and give the user the most precise errors possible.
-- improve the usage of types
-- handle ios pods and other specifics
-
-
+- more attention to edge cases: Api temporarily not available, wrong request, too many requests, etc.
+- test and handle ios
+- didn't test on web
 
 # Instructions
 

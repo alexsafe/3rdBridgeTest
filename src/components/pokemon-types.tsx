@@ -1,6 +1,7 @@
 import { DefaultError, useQuery } from "@tanstack/react-query";
 import { View, Text, StyleSheet, Image } from "react-native";
 import { PokemonService } from "../services";
+import { noOfRetries } from "../utils/constants/api.constants";
 
 type PokemonTypeProps = {
   typeUrl: string;
@@ -12,6 +13,7 @@ export default function PokemonType({ typeUrl }: PokemonTypeProps) {
     isLoading,
     error,
   } = useQuery<any, DefaultError>({
+    retry: noOfRetries,
     queryKey: ["pokemontype", typeUrl],
     queryFn: () => PokemonService.getPokemonTypes(typeUrl),
     select: (data) => ({

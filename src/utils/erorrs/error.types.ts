@@ -1,9 +1,8 @@
 export enum PokemonErrorType {
-  NetworkError = "NetworkError",
-  ServerError = "ServerError",
-  ClientError = "ClientError",
-  DataError = "DataError",
-  NotFound = "NotFound",
-  Unexpected = "undefined",
-  UnknownError = "DataError",
+  URLError = " Wrong request URL",
+  DataError = "Data Error",
+  NotFound = "Pokemon Not Found",
+  Unexpected = "Unexpected error",
+  UnknownError = "Unknown Error.",
+  NetworkError = "Network Error",
 }

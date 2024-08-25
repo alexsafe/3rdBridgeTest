@@ -13,6 +13,10 @@ export type ChainSpecies = {
   url: string
 }
 
+export type EvolutionData = {
+  chain:Chain
+}
+
 export type Chain = {
   evolves_to:Chain[]
   species: ChainSpecies

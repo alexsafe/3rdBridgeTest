@@ -1,6 +1,14 @@
+import { useRouter } from "expo-router";
 import React from "react";
 import { ReactNode, useRef } from "react";
-import { View, Text, Image, StyleSheet, Dimensions } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  Dimensions,
+  Pressable,
+} from "react-native";
 import Animated from "react-native-reanimated";
 
 interface PokeImageProps {
@@ -13,24 +21,30 @@ export default function PokeImage({
   shrinkStyle,
 }: PokeImageProps): ReactNode {
   const hasImage = !!imageUrl;
+  const router = useRouter();
+
+  const goHome = () => {
+    router.navigate({
+      pathname: "/pages/pokemons/",
+    });
+  };
 
   return (
     <>
-      {hasImage && (
-        <Animated.Image
-          source={{ uri: imageUrl }}
-          style={[
-            styles.tinyLogo,
-            shrinkStyle,
-          ]}
-        />
-      )}
+      <Pressable onPress={goHome}>
+        {hasImage && (
+          <Animated.Image
+            source={{ uri: imageUrl }}
+            style={[styles.tinyLogo, shrinkStyle]}
+          />
+        )}
+      </Pressable>
     </>
   );
 }
 const styles = StyleSheet.create({
   tinyLogo: {
-    width: 'auto',
+    width: "auto",
     height: 150,
     resizeMode: "contain",
     maxHeight: 150,

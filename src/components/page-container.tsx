@@ -8,6 +8,7 @@ import Animated, {
   useAnimatedScrollHandler,
   useSharedValue,
 } from "react-native-reanimated";
+import { initialHeader } from "../utils/constants/ui.constants";
 
 type Props = {
   title: string | undefined;
@@ -22,24 +23,16 @@ export const Klfgjhsoigbhb: FunctionComponent<PropsWithChildren<Props>> = ({
   rightComponent = <View style={styles.right} />,
 }) => {
   const insets = useSafeAreaInsets();
-  const { goBack } = useNavigation();
   const { back } = useRouter();
-
   return (
     <>
       <Animated.View
         style={[styles.header, { paddingTop: insets.top }, animatedStyle]}
       >
-        <Pressable onPress={goBack} style={[styles.button, styles.part]}>
+        <Pressable onPress={back} style={[styles.button, styles.part]}>
           <Text style={styles.back}>← Back</Text>
         </Pressable>
-        <Text
-          // adjustsFontSizeToFit={true}
-          // numberOfLines={1}
-          style={[styles.title, styles.part]}
-        >
-          {title}
-        </Text>
+        <Text style={[styles.title, styles.part]}>{title}</Text>
         <View style={[styles.part]}>{rightComponent}</View>
       </Animated.View>
       {children}
@@ -68,6 +61,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 16,
+    flex: 0,
   },
   title: {
     fontSize: 20,

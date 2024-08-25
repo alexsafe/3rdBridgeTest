@@ -1,16 +1,16 @@
-import { PokemonErrorType } from "./error.types";
-
-export const handleApiError = (error: any): PokemonErrorType => {
-  if (!error.response) {
-    return PokemonErrorType.NetworkError;
+export function apiError(
+    message: string,
+    status: number,
+    details?: string
+  ) {
+    const error = new Error(message) as ApiErrorType;
+    error.status = status;
+    error.details = details;
+    return error;
   }
-
-  switch (error.response.status) {
-    case 404:
-      return PokemonErrorType.NotFound;
-    case 500:
-      return PokemonErrorType.Unexpected;
-    default:
-      return PokemonErrorType.UnknownError;
+  
+  export interface  ApiErrorType extends Error {
+    status: number;
+    details?: string;
   }
-};
+  

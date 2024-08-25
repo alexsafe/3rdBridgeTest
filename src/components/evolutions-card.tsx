@@ -1,11 +1,25 @@
-import { DefaultError, useQueries, useQuery } from "@tanstack/react-query";
+import {
+  DefaultError,
+  useQueries,
+  useQuery,
+  UseQueryOptions,
+  UseQueryResult,
+} from "@tanstack/react-query";
 import React, { useMemo } from "react";
 import { View, Text, Pressable, StyleSheet } from "react-native";
-import { Species } from "../models";
+import { Chain, EvolutionData, Species } from "../models";
 import { PokemonService } from "../services";
 import { Link } from "expo-router";
 import { PokemonCard } from "./pokemon-card";
-import { baseUrl, pokemonEndpoint } from "../utils/constants/api.constants";
+import {
+  baseUrl,
+  noOfRetries,
+  pokemonEndpoint,
+} from "../utils/constants/api.constants";
+import { ApiErrorType } from "../utils/erorrs/api.errors";
+import Loading from "./loading";
+import { handleApiError } from "../utils/erorrs/error.handler.";
+import ComponentError from "./errors/pokemon-sub-errors";
 
 type EvolutionCardProps = {
   evolutionChainUrl: string;
@@ -20,7 +34,13 @@ export default function EvolutionCard({
     data: evolutionData,
     isLoading: isEvolutionsLoading,
     error: evolutionsError,
-  } = useQuery<any, DefaultError>({
+  } = useQuery<EvolutionData, ApiErrorType>({
+    retry: (failureCount, error) => {
+      if (error.status === 500 || failureCount < 3) {
+        return true;
+      }
+      return false;
+    },
     queryKey: ["evolutionChain", evolutionChainUrl],
     queryFn: () => PokemonService.getPokemonSpeciesEvolution(evolutionChainUrl),
     select: (data) => data,
@@ -31,7 +51,6 @@ export default function EvolutionCard({
     }
     const urls: string[] = [];
     let current = evolutionData.chain;
-    // console.log(evolutionData?.chain);
 
     while (current && current.evolves_to.length) {
       currentPokeUrl !== current.species.url && urls.push(current.species.url);
@@ -42,19 +61,21 @@ export default function EvolutionCard({
   }, [evolutionData]);
 
   const speciesQueries = useQueries({
-    queries: evolutionUrls.map((url) => ({
-      queryKey: ["pokemonSpecies", url],
-      queryFn: () => PokemonService.getPokemonSpecies(url),
-    })),
+    queries: evolutionUrls.map<UseQueryOptions<Species[], ApiErrorType>>(
+      (url) => ({
+        queryKey: ["pokemonSpecies", url],
+        queryFn: () => PokemonService.getPokemonSpecies(url),
+      })
+    ),
   });
 
   const isSpeciesLoading: boolean = speciesQueries.some(
     (query) => query.isLoading
   );
-  const speciesError: Error | null | undefined = speciesQueries.find(
+  const speciesError: ApiErrorType | null | undefined = speciesQueries.find(
     (query) => query.error
   )?.error;
-  const speciesData: Species[] = speciesQueries
+  const speciesData: any = speciesQueries
     .map((query, index) => {
       const data = query.data;
       if (data) {
@@ -64,16 +85,26 @@ export default function EvolutionCard({
     })
     .filter(Boolean);
 
+  if (isSpeciesLoading) return <Loading />;
+  if (speciesError) {
+    const errorResponse = handleApiError(speciesError);
+    return (
+      <ComponentError
+        title="Evolutions"
+        error={errorResponse}
+        details={speciesError.status.toString() || speciesError.message}
+      />
+    );
+  }
+
   if (!evolutionData) {
     return <Text>No evolution data...</Text>;
   }
 
-  //TODO handle loading and errors
-
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Evolutions</Text>
-      {speciesData.map((species, index) => (
+      {speciesData.map((species: Species, index: number) => (
         <View key={index}>
           <Link
             push
@@ -96,6 +127,7 @@ export default function EvolutionCard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+
   },
   title: {
     fontSize: 20,
