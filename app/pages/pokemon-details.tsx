@@ -33,9 +33,22 @@ import { handleApiError } from "../../src/utils/erorrs/error.handler.";
 import { ApiErrorType } from "../../src/utils/erorrs/api.errors";
 import Loading from "../../src/components/loading";
 import ComponentError from "../../src/components/errors/pokemon-sub-errors";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function PokemonDetails() {
   const { url } = useLocalSearchParams() as { url: string };
+  const insets =  useSafeAreaInsets();
+  // quick fix to ignore scroll for pokemons with less details like weedle
+  const [movesHeight, setMovesHeight] = useState(0);
+  const [extraPadding, setExtraPadding] = useState(0);
+  useEffect(() => {
+    const minHeight = screenHeight / 3 + insets.top;
+    if (movesHeight > minHeight) {
+      setExtraPadding(screenHeight * 0.25);
+    } else {
+      setExtraPadding(0);
+    }
+  }, [movesHeight]);
 
   const scrollY = useSharedValue<number>(0);
 
@@ -167,7 +180,6 @@ export default function PokemonDetails() {
   });
 
   if (isPokeLoading) return <Loading />;
-  // console.log(screenHeight);
   if (pokeError) {
     const errorResponse = handleApiError(pokeError);
     return (
@@ -186,6 +198,11 @@ export default function PokemonDetails() {
       details={errorSpecies.status.toString() || errorSpecies.message}
     />;
   }
+  const handleMovesLayout = (event: any) => {
+    const { height } = event.nativeEvent.layout;
+    setMovesHeight(height);
+  };
+
   return (
     <Klfgjhsoigbhb
       animatedStyle={animatedHeaderStyle}
@@ -203,7 +220,7 @@ export default function PokemonDetails() {
         contentContainerStyle={[
           {
             marginTop: screenPadding,
-            paddingBottom: screenHeight * 0.25,
+            paddingBottom: extraPadding,
             paddingHorizontal: screenPadding,
           },
         ]}
@@ -218,11 +235,13 @@ export default function PokemonDetails() {
           ))}
         </Text>
         <Text style={styles.title}>First 5 Moves</Text>
-        {pokeDetails?.moves.slice(0, 5).map((move: any, index: number) => (
-          <View key={index} style={styles.contentContainerStyle}>
-            <PokemonCard item={move.move} isFirst={true} />
-          </View>
-        ))}
+        <View onLayout={handleMovesLayout}>
+          {pokeDetails?.moves.slice(0, 5).map((move: any, index: number) => (
+            <View key={index} style={styles.contentContainerStyle}>
+              <PokemonCard item={move.move} isFirst={true} />
+            </View>
+          ))}
+        </View>
         <EvolutionCard
           evolutionChainUrl={pokeSpecies?.evolution_chain.url!}
           currentPokeUrl={currentSpeciesUrl!}

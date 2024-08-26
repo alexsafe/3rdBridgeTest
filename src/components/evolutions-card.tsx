@@ -20,6 +20,7 @@ import { ApiErrorType } from "../utils/erorrs/api.errors";
 import Loading from "./loading";
 import { handleApiError } from "../utils/erorrs/error.handler.";
 import ComponentError from "./errors/pokemon-sub-errors";
+import { screenHeight } from "../utils/constants/ui.constants";
 
 type EvolutionCardProps = {
   evolutionChainUrl: string;
@@ -127,7 +128,6 @@ export default function EvolutionCard({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
   },
   title: {
     fontSize: 20,
