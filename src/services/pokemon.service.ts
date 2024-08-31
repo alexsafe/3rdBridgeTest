@@ -1,7 +1,11 @@
 import axios from "axios";
-import { Species } from "../models";
+import { PokemonInfo, Species } from "../models";
 import { handleApiError } from "../utils/erorrs/error.handler.";
 import { apiError } from "../utils/erorrs/api.errors";
+
+type APIResponseType<T> = {
+  data: T
+}
 
 class PokemonServiceImpl {
   async getPokemons({
@@ -23,6 +27,13 @@ class PokemonServiceImpl {
     return response;
   }
 
+  /* TODO - Correct and integrate API calls with type signatures */ 
+
+  // async getPokemonDetails(url: string):Promise<PokemonInfo> {
+  //   const response = await this.getApi<PokemonInfo>(url);
+  //   return response;
+  // }
+
   async getPokemonDetails(url: string) {
     const response = await this.getApi(url);
     return response;
@@ -42,6 +53,9 @@ class PokemonServiceImpl {
     const response = await this.getApi(url);
     return response.data;
   }
+
+  /* TODO Integrate correct API generic typed calls */
+  // async getApi<T>(url: string | undefined): Promise<APIResponseType<T>> {
 
   async getApi(url: string | undefined) {
     try {

@@ -52,8 +52,6 @@ test("should return pokemon details data", async () => {
       }),
     })
   );
-  console.log(result.current.data?.name);
-  console.log(mockData.name);
 
   expect(result.current.data?.name).toEqual(mockData.name);
   expect(result.current.isLoading).toBe(false);

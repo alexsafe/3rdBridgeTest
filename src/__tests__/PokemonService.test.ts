@@ -18,7 +18,6 @@ describe('fetchData', () => {
     mockedAxios.get.mockResolvedValueOnce({ status: 200, data: mockData });
 
     const result = await PokemonService.getPokemonDetails('https://pokeapi.co/api/v2/pokemon/1');
-    console.log(result);
     expect(result).toEqual(mockData);
   });
 

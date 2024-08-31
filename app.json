@@ -6,6 +6,7 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "test-technique",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -30,6 +31,5 @@
     "plugins": [
       "expo-router"
     ]
-  },
-  "scheme": "test-technique"
+  }
 }

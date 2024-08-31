@@ -34,10 +34,18 @@ import { ApiErrorType } from "../../src/utils/erorrs/api.errors";
 import Loading from "../../src/components/loading";
 import ComponentError from "../../src/components/errors/pokemon-sub-errors";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAnimatedScroll } from "../../src/hooks/useScrollHandler";
 
 export default function PokemonDetails() {
   const { url } = useLocalSearchParams() as { url: string };
-  const insets =  useSafeAreaInsets();
+  const insets = useSafeAreaInsets();
+  const {
+    scrollHandler,
+    animatedScrollViewStyle,
+    animatedAvatarStyle,
+    animatedHeaderStyle,
+  } = useAnimatedScroll();
+
   // quick fix to ignore scroll for pokemons with less details like weedle
   const [movesHeight, setMovesHeight] = useState(0);
   const [extraPadding, setExtraPadding] = useState(0);
@@ -50,91 +58,6 @@ export default function PokemonDetails() {
     }
   }, [movesHeight]);
 
-  const scrollY = useSharedValue<number>(0);
-
-  const scrollHandler = useAnimatedScrollHandler({
-    onScroll: (event) => {
-      scrollY.value = event.contentOffset.y;
-    },
-  });
-
-  const animatedScrollViewStyle = useAnimatedStyle(() => {
-    return {
-      paddingTop: withTiming(
-        interpolate(
-          scrollY.value,
-          [0, 70],
-          [0, initialHeader + screenPadding],
-          Extrapolation.CLAMP
-        ),
-        {
-          duration,
-        }
-      ),
-    };
-  });
-
-  const animatedHeaderStyle = useAnimatedStyle(() => {
-    return {
-      height: withTiming(
-        interpolate(
-          scrollY.value,
-          [0, 100],
-          [headerHeight, initialHeader],
-          Extrapolation.CLAMP
-        ),
-        {
-          duration,
-        }
-      ),
-    };
-  });
-
-  const animatedAvatarStyle = useAnimatedStyle(() => {
-    return {
-      width: withTiming(
-        interpolate(
-          scrollY.value,
-          [0, 70],
-          [avatarInitialResolution, avatarCollapsedResolution],
-          Extrapolation.CLAMP
-        ),
-        {
-          duration,
-        }
-      ),
-      height: withTiming(
-        interpolate(
-          scrollY.value,
-          [0, 70],
-          [avatarInitialResolution, avatarCollapsedResolution],
-          Extrapolation.CLAMP
-        ),
-        {
-          duration,
-        }
-      ),
-      transform: [
-        {
-          translateY: withTiming(
-            interpolate(scrollY.value, [0, 100], [0, -50], Extrapolation.CLAMP),
-            { duration }
-          ),
-        },
-        {
-          translateX: withTiming(
-            interpolate(
-              scrollY.value,
-              [0, 100],
-              [0, imageCollapsedX],
-              Extrapolation.CLAMP
-            ),
-            { duration }
-          ),
-        },
-      ],
-    };
-  });
 
   const {
     data: pokeDetails,
